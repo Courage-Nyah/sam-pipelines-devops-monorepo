@@ -14,3 +14,10 @@ phases:
       - env
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
       - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml create-stack --stack-name workflow-dev-${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=workflow-dev-lambda-${ENV_PIPELINE_NAME} ParameterKey=SourceVariables,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
+      
+      - ls -la ${CODEBUILD_SRC_DIR_main}
+      - echo ${ENV_PIPELINE_NAME}
+      - source ${CODEBUILD_SRC_DIR_main}/config.env
+      - env
+#      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
+      - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml create-stack --stack-name workflow-prod-${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=workflow-prod-lambda-${ENV_PIPELINE_NAME} ParameterKey=SourceVariables,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
