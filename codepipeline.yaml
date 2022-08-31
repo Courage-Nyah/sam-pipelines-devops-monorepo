@@ -19,19 +19,6 @@ Parameters:
   DevOpsFullRepositoryId:
     Type: String
     Default: Courage-Nyah/sam-pipelines-devops-monorepo
-  MainGitBranch:
-    Type: String
-    Default: main
-  devStackName:
-    Type: String
-    Default: "workflow-dev-${ENV_PIPELINE_NAME}"
-  S3ArtifactStore:
-    Type: String
-    Description: the S3 bucket where artifacts will be stored
-    Default: mra-lambda-repo-us-east-1
-  prodStackName:
-    Type: String
-    Default: "workflow-prod-${ENV_PIPELINE_NAME}"
   S3ArtifactStore:
     Type: String
     Description: the S3 bucket where artifacts will be stored
@@ -40,9 +27,6 @@ Parameters:
     Type: String
     Description: the arn of the CodeStar connection used to connect to GitHub
     Default: arn:aws:codestar-connections:us-east-1:232791766003:connection/19e979fb-b110-4d15-8a25-4d335987b829
-  FeatureGitBranch:
-    Type: String
-    Default: ""
   Project:
     Type: String
     Description: Project Name
@@ -92,10 +76,6 @@ Mappings:
       AccountEnv: nprd
     '232791766003':
       AccountEnv: prd
-Conditions:
-  IsMainBranchPipeline: !Equals [!Ref FeatureGitBranch, ""]
-  IsFeatureBranchPipeline: !Not [Condition: IsMainBranchPipeline]
-  CreateConnection: !Equals [!Ref CodeStarConnectionArn, ""]
 Resources:
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -123,7 +103,7 @@ Resources:
               Ref: CodeStarConnectionArn
             FullRepositoryId:
               Ref: AppFullRepositoryId
-            BranchName: !If [IsFeatureBranchPipeline, !Ref FeatureGitBranch, !Ref MainGitBranch]
+            BranchName: dev
             OutputArtifactFormat: CODEBUILD_CLONE_REF
             DetectChanges: false
           OutputArtifacts:
