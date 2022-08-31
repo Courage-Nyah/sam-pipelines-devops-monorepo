@@ -31,7 +31,7 @@ Parameters:
     Default: mra-lambda-repo-us-east-1
   prodStackName:
     Type: String
-    Default: "workflow-dev-${ENV_PIPELINE_NAME}"
+    Default: "workflow-prod-${ENV_PIPELINE_NAME}"
   S3ArtifactStore:
     Type: String
     Description: the S3 bucket where artifacts will be stored
