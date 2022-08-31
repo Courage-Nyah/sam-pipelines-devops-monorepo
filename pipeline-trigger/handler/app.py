@@ -6,6 +6,7 @@ def lambda_handler(event, context):
     print(event)
     if 'body' in event:
         githubEventPayload=json.loads(event['body'])
+        print(githubEventPayload)
         if 'commits' in githubEventPayload and len(githubEventPayload['commits']) > 0:
             curr_commit = githubEventPayload["commits"][0]
             committed_files = []
