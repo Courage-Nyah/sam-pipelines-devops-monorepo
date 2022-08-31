@@ -105,7 +105,7 @@ Resources:
               Ref: AppFullRepositoryId
             BranchName: dev
             OutputArtifactFormat: CODEBUILD_CLONE_REF
-            DetectChanges: false
+            DetectChanges: true
           OutputArtifacts:
           - Name: SourceArtifact
           RunOrder: 1
