@@ -144,9 +144,9 @@ Resources:
           OutputArtifacts:
           - Name: BuildArtifact
           RunOrder: 1
-      - Name: Dev-Deploy
+      - Name: uat-Deploy
         Actions:
-        - Name: Dev-Deploy
+        - Name: uat-Deploy
           ActionTypeId:
             Category: Build
             Owner: AWS
@@ -159,7 +159,7 @@ Resources:
               {"name":"ENV","value":"workflow_lambda_uat_env","type":"PARAMETER_STORE"},
               {"name":"BUILD_NUMBER","value":"#{BuildVariables.CODEBUILD_BUILD_NUMBER}","type":"PLAINTEXT"},
               {"name":"REGION","value":"workflow_lambda_region","type":"PARAMETER_STORE"}]'
-          Namespace: Dev-DeployVariables
+          Namespace: uat-DeployVariables
           InputArtifacts:
           - Name: BuildArtifact
           OutputArtifacts: []
@@ -175,9 +175,9 @@ Resources:
           Configuration:
             NotificationArn: arn:aws:sns:us-east-1:232791766003:React-code-pipeline-Manual-approval
           RunOrder: 1
-      - Name: QA-Deploy
+      - Name: Prod-Deploy
         Actions:
-        - Name: QA-Deploy
+        - Name: Prod-Deploy
           ActionTypeId:
             Category: Build
             Owner: AWS
@@ -190,7 +190,7 @@ Resources:
               {"name":"ENV","value":"workflow_lambda_prod_env","type":"PARAMETER_STORE"},
               {"name":"BUILD_NUMBER","value":"#{BuildVariables.CODEBUILD_BUILD_NUMBER}","type":"PLAINTEXT"},
               {"name":"REGION","value":"workflow_lambda_region","type":"PARAMETER_STORE"}]'
-          Namespace: QA-DeployVariables
+          Namespace: Prod-DeployVariables
           InputArtifacts:
           - Name: BuildArtifact
           OutputArtifacts: []
