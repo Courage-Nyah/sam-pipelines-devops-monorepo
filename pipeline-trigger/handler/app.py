@@ -14,7 +14,6 @@ def lambda_handler(event, context):
             print(branch)
         if branch == 'dev':
             print("abc")
-            workflow-dev-${ENV_PIPELINE_NAME}
         else:
             print("xyz")
         if 'commits' in githubEventPayload and len(githubEventPayload['commits']) > 0:
