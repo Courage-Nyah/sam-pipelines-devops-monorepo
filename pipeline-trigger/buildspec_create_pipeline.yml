@@ -10,8 +10,8 @@ phases:
     commands:
       - ls -la ${CODEBUILD_SRC_DIR_dev}
       - echo ${ENV_PIPELINE_NAME}
-      - echo ${branch}
+      - echo ${ENV_BRANCH}
       - source ${CODEBUILD_SRC_DIR_dev}/config.env
       - env
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
-      - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml --stack-name workflow-${branch}-${ENV_PIPELINE_NAME} --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=workflow-${branch}-lambda-${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
+      - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml --stack-name workflow-${ENV_BRANCH}-${ENV_PIPELINE_NAME} --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=workflow-${branch}-lambda-${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
