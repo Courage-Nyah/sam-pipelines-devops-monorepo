@@ -7,8 +7,11 @@ def lambda_handler(event, context):
     if 'body' in event:
         githubEventPayload=json.loads(event['body'])
         if 'ref' in githubEventPayload:
-            url = githubEventPayload['ref'][0]
+            url = githubEventPayload['ref']
             print("This is URL", url)
+            url = 'refs/heads/dev'
+            branch = url.rsplit('/', 1)[1]
+            print(branch)
         if 'commits' in githubEventPayload and len(githubEventPayload['commits']) > 0:
             curr_commit = githubEventPayload["commits"][0]
             committed_files = []
