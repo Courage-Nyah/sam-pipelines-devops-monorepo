@@ -115,6 +115,8 @@ Resources:
             Value: !Ref PipelineName
           - Name: ENV_CODESTAR_CONNECTION_ARN
             Value: !Ref CodeStarConnectionArn
+          - Name: branch
+            Value: "dev"
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
         Type: GITHUB
