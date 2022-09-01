@@ -12,6 +12,6 @@ phases:
       - echo ${ENV_PIPELINE_NAME}
       - source ${CODEBUILD_SRC_DIR_dev}/config.env
       - env
-        if [ "branch" = "dev" ]; then
+      - if [ "branch" = "dev" ]; then
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
       - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml create-stack --stack-name workflow-dev-${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=workflow-dev-lambda-${ENV_PIPELINE_NAME} ParameterKey=SourceVariables,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
