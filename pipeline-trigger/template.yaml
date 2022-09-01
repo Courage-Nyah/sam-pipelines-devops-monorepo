@@ -18,7 +18,9 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Default: "arn:aws:codestar-connections:us-east-1:232791766003:connection/19e979fb-b110-4d15-8a25-4d335987b829"
-
+  Branch:
+  Type: String
+  Default: "dev"
 Resources:
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -116,7 +118,7 @@ Resources:
           - Name: ENV_CODESTAR_CONNECTION_ARN
             Value: !Ref CodeStarConnectionArn
           - Name: branch
-            Value: "dev"
+            Value: !Ref Branch
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
         Type: GITHUB
