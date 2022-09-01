@@ -117,7 +117,7 @@ Resources:
             Value: !Ref PipelineName
           - Name: ENV_CODESTAR_CONNECTION_ARN
             Value: !Ref CodeStarConnectionArn
-          - Name: branch
+          - Name: ENV_BRANCH
             Value: !Ref Branch
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Source:
