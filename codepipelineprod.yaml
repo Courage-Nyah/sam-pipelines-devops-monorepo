@@ -1,0 +1,224 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates CodePipeline for workflow lambda Build/Deploy
+Parameters:
+  ResourceType:
+    Type: String
+    Description: The type of the resource
+    Default: lambda
+  SubFolderName:
+    Type: String
+    Description: The sub project folder name
+    Default: ''
+  ProjectDesc:
+    Type: String
+    Description: the CodePipeline Project description
+    Default: CI/CD Pipeline for ESG-DTC-WRKFLW-Lambda-Build/Deploy
+  AppFullRepositoryId:
+    Type: String
+    Default: moodyssharedservices/workflowautomation-api-tobe-deleted
+  DevOpsFullRepositoryId:
+    Type: String
+    Default: Courage-Nyah/sam-pipelines-devops-monorepo
+  S3ArtifactStore:
+    Type: String
+    Description: the S3 bucket where artifacts will be stored
+    Default: mra-lambda-repo-us-east-1
+  CodeStarConnectionArn:
+    Type: String
+    Description: the arn of the CodeStar connection used to connect to GitHub
+    Default: arn:aws:codestar-connections:us-east-1:232791766003:connection/19e979fb-b110-4d15-8a25-4d335987b829
+  Project:
+    Type: String
+    Description: Project Name
+    Default: workflow
+  Application:
+    Type: String
+    Description: Application Name
+    Default: workflow
+  AppIdTag:
+    Type: String
+    Description: AppId Within Service Now.  Used for Tagging.  If unknown, use Acct
+    AllowedValues:
+    - 11666
+    Default: 11666
+  OwnerTag:
+    Type: String
+    Description: Owner, used for Tagging
+    Default: cit_cloud_sre@moodys.com
+  RevenueTag:
+    Type: String
+    Description: Revenue, used for Tagging
+    Default: y
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: CodePipeline
+      Parameters:
+      - ResourceType
+      - ProjectDesc
+      - SubFolderName
+      - ComputeType
+      - GitRepoUrl
+      - CodeStarConnectionArn
+      - S3ArtifactStore
+    - Label:
+        default: Tagging
+      Parameters:
+      - Project
+      - Application
+      - AppIdTag
+      - OwnerTag
+      - RevenueTag
+Mappings:
+  Accounts:
+    '938540043867':
+      AccountEnv: nprd
+    '232791766003':
+      AccountEnv: prd
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name:
+        Ref: SubFolderName
+      ArtifactStore:
+        Type: S3
+        Location:
+          Ref: S3ArtifactStore
+      RestartExecutionOnUpdate: true
+      RoleArn:
+        Fn::ImportValue: CodePipeline-Service-Role-arn
+      Stages:
+      - Name: Source
+        Actions:
+        - Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Provider: CodeStarSourceConnection
+            Version: '1'
+          Configuration:
+            ConnectionArn:
+              Ref: CodeStarConnectionArn
+            FullRepositoryId:
+              Ref: AppFullRepositoryId
+            BranchName: main
+            OutputArtifactFormat: CODEBUILD_CLONE_REF
+            DetectChanges: true
+          OutputArtifacts:
+          - Name: SourceArtifact
+          RunOrder: 1
+      - Name: Setup
+        Actions:
+        - Name: Setup
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            BatchEnabled: false
+            ProjectName: ESG-DTC-WORKFLOW-Lambda-Setup
+          Namespace: SetupVariables
+          InputArtifacts:
+          - Name: SourceArtifact
+          OutputArtifacts:
+          - Name: SetupArtifact
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            BatchEnabled: false
+            ProjectName: ESG-DTC-WRKFLW-Lambda-Build
+            EnvironmentVariables: '[{"name":"APP","value":"#{SetupVariables.APP_NAME}","type":"PLAINTEXT"}]'
+          Namespace: BuildVariables
+          InputArtifacts:
+          - Name: SourceArtifact
+          OutputArtifacts:
+          - Name: BuildArtifact
+          RunOrder: 1
+      - Name: Dev-Deploy
+        Actions:
+        - Name: Dev-Deploy
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            BatchEnabled: false
+            ProjectName: ESG-DTC-WRKFLW-Lambda-Deploy-Configuration-Deploy
+            EnvironmentVariables: '[{"name":"APP","value":"#{SetupVariables.APP_NAME}","type":"PLAINTEXT"},
+              {"name":"ENV","value":"workflow_lambda_uat_env","type":"PARAMETER_STORE"},
+              {"name":"BUILD_NUMBER","value":"#{BuildVariables.CODEBUILD_BUILD_NUMBER}","type":"PLAINTEXT"},
+              {"name":"REGION","value":"workflow_lambda_region","type":"PARAMETER_STORE"}]'
+          Namespace: Dev-DeployVariables
+          InputArtifacts:
+          - Name: BuildArtifact
+          OutputArtifacts: []
+          RunOrder: 1
+      - Name: Approval
+        Actions:
+        - Name: ApprovalOrDeny
+          ActionTypeId:
+            Category: Approval
+            Owner: AWS
+            Provider: Manual
+            Version: '1'
+          Configuration:
+            NotificationArn: arn:aws:sns:us-east-1:232791766003:React-code-pipeline-Manual-approval
+          RunOrder: 1
+      - Name: QA-Deploy
+        Actions:
+        - Name: QA-Deploy
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            BatchEnabled: false
+            ProjectName: ESG-DTC-WRKFLW-Lambda-Deploy-Configuration-Deploy
+            EnvironmentVariables: '[{"name":"APP","value":"#{SetupVariables.APP_NAME}","type":"PLAINTEXT"},
+              {"name":"ENV","value":"workflow_lambda_prod_env","type":"PARAMETER_STORE"},
+              {"name":"BUILD_NUMBER","value":"#{BuildVariables.CODEBUILD_BUILD_NUMBER}","type":"PLAINTEXT"},
+              {"name":"REGION","value":"workflow_lambda_region","type":"PARAMETER_STORE"}]'
+          Namespace: QA-DeployVariables
+          InputArtifacts:
+          - Name: BuildArtifact
+          OutputArtifacts: []
+          RunOrder: 1
+      Tags:
+      - Key: Name
+        Value:
+          Ref: SubFolderName
+      - Key: project
+        Value:
+          Ref: Project
+      - Key: application
+        Value:
+          Ref: Application
+      - Key: app_id
+        Value:
+          Ref: AppIdTag
+      - Key: owner
+        Value:
+          Ref: OwnerTag
+      - Key: account_env
+        Value:
+          Fn::FindInMap:
+          - Accounts
+          - Ref: AWS::AccountId
+          - AccountEnv
+      - Key: revenue
+        Value:
+          Ref: RevenueTag
+    Metadata:
+      SamResourceId: Pipeline
