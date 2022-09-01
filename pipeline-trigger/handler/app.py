@@ -56,7 +56,7 @@ def lambda_handler(event, context):
                     cbclient.start_build(projectName=projectName,
                                          environmentVariablesOverride=[{
                                                 'name': 'ENV_PIPELINE_NAME',
-                                                'value': folderName,
+                                                'value': workflow-dev-lambda-folderName,
                                                 'type': 'PLAINTEXT'
                                         }])
 
