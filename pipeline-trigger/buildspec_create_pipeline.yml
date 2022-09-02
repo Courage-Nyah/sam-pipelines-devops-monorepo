@@ -13,9 +13,4 @@ phases:
       - source ${CODEBUILD_SRC_DIR_dev}/config.env
       - env
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
-      - environ=(${ENV//-/ })
-      - if [${environ[1]}=='prod']; then
-           sam deploy -t ${CODEBUILD_SRC_DIR}/codepipelineprod.yaml --stack-name ${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
-        else
-           sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml --stack-name ${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
-         fi
+      - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipeline.yaml --stack-name ${ENV_PIPELINE_NAME} --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
