@@ -9,11 +9,11 @@ def lambda_handler(event, context):
         if 'ref' in githubEventPayload:
             url = githubEventPayload['ref']
             print("This is URL", url)
-            url = 'refs/heads/dev'
+            # url = 'refs/heads/dev'
             branch = url.rsplit('/', 1)[1]
             print(branch)
-        if branch == 'dev':
-            print("abc")
+        if branch == 'main':
+            branch = 'prod'
         else:
             print("xyz")
         if 'commits' in githubEventPayload and len(githubEventPayload['commits']) > 0:
@@ -56,7 +56,7 @@ def lambda_handler(event, context):
                     cbclient.start_build(projectName=projectName,
                                          environmentVariablesOverride=[{
                                                 'name': 'ENV_PIPELINE_NAME',
-                                                'value': folderName,
+                                                'value': f'workflow-{branch}-lambda-{folderName}',
                                                 'type': 'PLAINTEXT'
                                         }])
 
