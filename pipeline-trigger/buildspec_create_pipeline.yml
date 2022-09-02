@@ -10,8 +10,6 @@ phases:
     commands:
       - ls -la ${CODEBUILD_SRC_DIR_dev}
       - echo ${ENV_PIPELINE_NAME}
-      -  if branch == 'dev':
-          echo ${ENV_BRANCH}
       - source ${CODEBUILD_SRC_DIR_dev}/config.env
       - env
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
