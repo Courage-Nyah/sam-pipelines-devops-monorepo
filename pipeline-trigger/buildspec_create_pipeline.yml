@@ -12,7 +12,7 @@ phases:
       - echo ${ENV_PIPELINE_NAME}
       - source ${CODEBUILD_SRC_DIR_dev}/config.env
       - env
-      environ=(${ENV//-/}):
+      - environ=(${ENV//-/})
      if [${environ[1]=='prod']; then
 #      - . ${CODEBUILD_SRC_DIR}/assume-role.sh ${ENV_PIPELINE_EXECUTION_ROLE} deploy
       - sam deploy -t ${CODEBUILD_SRC_DIR}/codepipelineprod.yaml --stack-name ${ENV_PIPELINE_NAME} --no-fail-on-empty-changeset --capabilities=CAPABILITY_IAM --parameter-overrides ParameterKey=SubFolderName,ParameterValue=${ENV_PIPELINE_NAME} ParameterKey=ResourceType,ParameterValue=${ENV_RESOURCE_TYPE} ParameterKey=CodeStarConnectionArn,ParameterValue=${ENV_CODESTAR_CONNECTION_ARN}
